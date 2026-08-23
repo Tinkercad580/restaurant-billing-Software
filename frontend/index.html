@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="css/styles.css?v=8" />
+<link rel="stylesheet" href="css/styles.css?v=12" />
 </head>
 <body>
 <div class="app-shell">
@@ -27,32 +27,21 @@
       <button class="nav-item" data-view="history">Order History</button>
     </nav>
 
-    <div class="topbar-section topbar-clock">
-      <div id="clock" class="clock">--:--:--</div>
-      <div class="date" id="dateLabel">--</div>
+    <div class="topbar-section header-stats" id="todayStats">
+      <div class="stat">
+        <span class="stat-value" id="statSales">₹0</span>
+        <span class="stat-label">Today's Sales</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="statOrders">0</span>
+        <span class="stat-label">Orders Today</span>
+      </div>
     </div>
   </header>
 
   <main class="main">
     <!-- ========== BILLING VIEW ========== -->
     <section id="view-billing" class="view active">
-      <header class="view-header">
-        <div>
-          <h1>New Bill</h1>
-          <p class="subtitle">Pick items, adjust quantity, apply tax &amp; discount</p>
-        </div>
-        <div class="header-stats" id="todayStats">
-          <div class="stat">
-            <span class="stat-value" id="statSales">₹0</span>
-            <span class="stat-label">Today's Sales</span>
-          </div>
-          <div class="stat">
-            <span class="stat-value" id="statOrders">0</span>
-            <span class="stat-label">Orders Today</span>
-          </div>
-        </div>
-      </header>
-
       <div class="billing-layout">
         <div class="filter-panel">
           <div class="filter-block">
@@ -299,6 +288,7 @@
               <th>Items</th>
               <th>Total</th>
               <th>Payment</th>
+              <th></th>
             </tr>
           </thead>
           <tbody id="ordersTableBody"></tbody>
@@ -377,13 +367,13 @@
 
 <div id="toast" class="toast"></div>
 
-<script src="js/api.js?v=8"></script>
-<script src="js/custom-select.js?v=8"></script>
-<script src="js/datepicker.js?v=8"></script>
-<script src="js/billing.js?v=8"></script>
-<script src="js/menu-management.js?v=8"></script>
-<script src="js/history.js?v=8"></script>
-<script src="js/deliveries.js?v=8"></script>
-<script src="js/app.js?v=8"></script>
+<script src="js/api.js?v=12"></script>
+<script src="js/custom-select.js?v=12"></script>
+<script src="js/datepicker.js?v=12"></script>
+<script src="js/billing.js?v=12"></script>
+<script src="js/menu-management.js?v=12"></script>
+<script src="js/history.js?v=12"></script>
+<script src="js/deliveries.js?v=12"></script>
+<script src="js/app.js?v=12"></script>
 </body>
 </html>

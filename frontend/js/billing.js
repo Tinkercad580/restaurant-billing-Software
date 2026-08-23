@@ -418,5 +418,5 @@ const Billing = (() => {
     return div.innerHTML;
   }
 
-  return { init, loadMenu, loadCategoriesInto, refreshCategoryPills, refreshTodayStats };
+  return { init, loadMenu, loadCategoriesInto, refreshCategoryPills, refreshTodayStats, printReceipt };
 })();

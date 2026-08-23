@@ -30,6 +30,21 @@ app.get("/api/health", (_req, res) => {
 const frontendPath = path.join(__dirname, "..", "..", "frontend");
 app.use(express.static(frontendPath));
 
+// Final safety net: any error that reaches here (from asyncHandler, or a
+// synchronous throw) gets a clean JSON response instead of an unhandled
+// exception. The network to the database is unreliable enough that we'd
+// rather degrade gracefully on a bad request than take the whole app down.
+app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error("Unhandled request error:", err.message);
+  if (!res.headersSent) {
+    res.status(500).json({ error: "Something went wrong. Please try again." });
+  }
+});
+
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled promise rejection (ignored to keep the server alive):", reason);
+});
+
 initDb()
   .then(() => {
     app.listen(PORT, () => {

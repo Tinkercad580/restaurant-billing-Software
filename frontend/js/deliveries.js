@@ -70,11 +70,15 @@ const Deliveries = (() => {
           <td style="white-space:nowrap">
             ${next ? `<button class="icon-btn" data-action="advance" data-id="${order.id}" data-status="${next.status}">${next.label}</button>` : ""}
             ${status === "pending" || status === "out_for_delivery" ? `<button class="icon-btn danger" data-action="advance" data-id="${order.id}" data-status="cancelled">Cancel</button>` : ""}
+            <button class="icon-btn" data-action="print" data-bill="${order.billNumber}">Print</button>
           </td>
         </tr>`;
       })
       .join("");
 
+    tbody.querySelectorAll("[data-action='print']").forEach((btn, idx) => {
+      btn.addEventListener("click", () => Billing.printReceipt(orders[idx]));
+    });
     tbody.querySelectorAll("[data-action='advance']").forEach((btn) => {
       btn.addEventListener("click", () => handleStatusChange(btn.dataset.id, btn.dataset.status));
     });

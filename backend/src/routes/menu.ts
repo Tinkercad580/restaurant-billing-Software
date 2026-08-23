@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { pool } from "../db";
+import { asyncHandler } from "../asyncHandler";
 import { MenuItem } from "../types";
 
 const router = Router();
@@ -46,7 +47,7 @@ export async function getMenuItemById(id: string): Promise<MenuItem | undefined>
 }
 
 // GET /api/menu?category=Starters&search=paneer&veg=veg|nonveg|all
-router.get("/", async (req: Request, res: Response) => {
+router.get("/", asyncHandler(async (req: Request, res: Response) => {
   const { category, search, veg } = req.query;
   let items = await loadCache();
 
@@ -64,17 +65,17 @@ router.get("/", async (req: Request, res: Response) => {
   }
 
   res.json(items);
-});
+}));
 
 // GET /api/menu/categories
-router.get("/categories", async (_req: Request, res: Response) => {
+router.get("/categories", asyncHandler(async (_req: Request, res: Response) => {
   const items = await loadCache();
   const categories = Array.from(new Set(items.map((i) => i.category))).sort();
   res.json(categories);
-});
+}));
 
 // POST /api/menu
-router.post("/", async (req: Request, res: Response) => {
+router.post("/", asyncHandler(async (req: Request, res: Response) => {
   const { name, price, category, description, available, isVeg, imageUrl, hasPortions, halfPrice, fullPrice } =
     req.body;
 
@@ -129,10 +130,10 @@ router.post("/", async (req: Request, res: Response) => {
 
   invalidateCache();
   res.status(201).json(mapRow(rows[0]));
-});
+}));
 
 // PUT /api/menu/:id
-router.put("/:id", async (req: Request, res: Response) => {
+router.put("/:id", asyncHandler(async (req: Request, res: Response) => {
   const existing = await pool.query("SELECT * FROM menu_items WHERE id = $1", [req.params.id]);
   if (existing.rowCount === 0) {
     return res.status(404).json({ error: "Menu item not found" });
@@ -233,16 +234,16 @@ router.put("/:id", async (req: Request, res: Response) => {
 
   invalidateCache();
   res.json(mapRow(rows[0]));
-});
+}));
 
 // DELETE /api/menu/:id
-router.delete("/:id", async (req: Request, res: Response) => {
+router.delete("/:id", asyncHandler(async (req: Request, res: Response) => {
   const { rows } = await pool.query("DELETE FROM menu_items WHERE id = $1 RETURNING *", [req.params.id]);
   if (rows.length === 0) {
     return res.status(404).json({ error: "Menu item not found" });
   }
   invalidateCache();
   res.json(mapRow(rows[0]));
-});
+}));
 
 export default router;

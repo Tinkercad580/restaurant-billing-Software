@@ -1,10 +1,28 @@
 import fs from "fs";
 import path from "path";
-import { Pool } from "pg";
+import { Pool, neonConfig } from "@neondatabase/serverless";
+import ws from "ws";
 import { uploadBuffer } from "./cloudinary";
+
+// The network path from this environment to Neon's ap-southeast-1 endpoint
+// is intermittently lossy (confirmed: both raw TCP:5432 and WSS:443 to the
+// same host time out sporadically, while other HTTPS traffic is unaffected —
+// so it's route/peering flakiness to that specific region, not a port
+// block). Nothing here can fix the network itself; the app is written to
+// retry on startup and never crash on a mid-request drop instead.
+neonConfig.webSocketConstructor = ws;
 
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+});
+
+// node-postgres emits 'error' on the pool for background failures on idle
+// connections (e.g. the network dropping a WebSocket). Unhandled, that's an
+// uncaught EventEmitter error and Node kills the whole process. Since this
+// network is genuinely flaky, that would mean random requests occasionally
+// crashing the entire server — log it and let the pool recover instead.
+pool.on("error", (err: Error) => {
+  console.error("Postgres pool error (connection likely dropped by the network):", err.message);
 });
 
 const LEGACY_JSON_PATH = path.join(__dirname, "data", "db.json");
@@ -198,8 +216,23 @@ async function seedIfEmpty(): Promise<void> {
   console.log("Seeded default menu items into Postgres.");
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 export async function initDb(): Promise<void> {
-  await createSchema();
-  await migrateLegacyJsonIfPresent();
-  await seedIfEmpty();
+  const MAX_ATTEMPTS = 6;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      await createSchema();
+      await migrateLegacyJsonIfPresent();
+      await seedIfEmpty();
+      return;
+    } catch (err) {
+      if (attempt === MAX_ATTEMPTS) throw err;
+      const delay = Math.min(attempt * 4000, 15000);
+      console.warn(
+        `Database connection attempt ${attempt}/${MAX_ATTEMPTS} failed (likely a transient network blip reaching Neon). Retrying in ${delay / 1000}s...`
+      );
+      await sleep(delay);
+    }
+  }
 }

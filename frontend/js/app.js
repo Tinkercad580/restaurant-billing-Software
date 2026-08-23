@@ -22,24 +22,8 @@
     });
   }
 
-  function setupClock() {
-    function tick() {
-      const now = new Date();
-      document.getElementById("clock").textContent = now.toLocaleTimeString();
-      document.getElementById("dateLabel").textContent = now.toLocaleDateString(undefined, {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      });
-    }
-    tick();
-    setInterval(tick, 1000);
-  }
-
   document.addEventListener("DOMContentLoaded", async () => {
     setupNav();
-    setupClock();
     await Billing.init();
     MenuManagement.init();
     OrderHistory.init();

@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { pool } from "../db";
+import { asyncHandler } from "../asyncHandler";
 import { getMenuItemById } from "./menu";
 import { DeliveryStatus, DiscountType, Order, OrderLineItem, OrderType, Portion } from "../types";
 
@@ -37,7 +38,7 @@ function mapRow(row: any): Order {
 }
 
 // GET /api/orders?date=today&from=2026-08-01&to=2026-08-22&payment=cash&search=1001
-router.get("/", async (req: Request, res: Response) => {
+router.get("/", asyncHandler(async (req: Request, res: Response) => {
   const { date, from, to, payment, search, orderType, deliveryStatus } = req.query;
 
   const conditions: string[] = [];
@@ -77,10 +78,10 @@ router.get("/", async (req: Request, res: Response) => {
   const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
   const { rows } = await pool.query(`SELECT * FROM orders ${where} ORDER BY created_at DESC`, params);
   res.json(rows.map(mapRow));
-});
+}));
 
 // GET /api/orders/summary/today
-router.get("/summary/today", async (_req: Request, res: Response) => {
+router.get("/summary/today", asyncHandler(async (_req: Request, res: Response) => {
   const { rows } = await pool.query(
     `SELECT total, items FROM orders
      WHERE created_at >= date_trunc('day', now()) AND created_at < date_trunc('day', now()) + interval '1 day'`
@@ -95,19 +96,19 @@ router.get("/summary/today", async (_req: Request, res: Response) => {
   const averageBill = totalOrders > 0 ? round2(totalSales / totalOrders) : 0;
 
   res.json({ totalSales, totalOrders, totalItemsSold, averageBill });
-});
+}));
 
 // GET /api/orders/:id
-router.get("/:id", async (req: Request, res: Response) => {
+router.get("/:id", asyncHandler(async (req: Request, res: Response) => {
   const { rows } = await pool.query("SELECT * FROM orders WHERE id = $1", [req.params.id]);
   if (rows.length === 0) {
     return res.status(404).json({ error: "Order not found" });
   }
   res.json(mapRow(rows[0]));
-});
+}));
 
 // POST /api/orders
-router.post("/", async (req: Request, res: Response) => {
+router.post("/", asyncHandler(async (req: Request, res: Response) => {
   const {
     items,
     taxRate,
@@ -242,10 +243,10 @@ router.post("/", async (req: Request, res: Response) => {
   );
 
   res.status(201).json(mapRow(rows[0]));
-});
+}));
 
 // PATCH /api/orders/:id/delivery-status
-router.patch("/:id/delivery-status", async (req: Request, res: Response) => {
+router.patch("/:id/delivery-status", asyncHandler(async (req: Request, res: Response) => {
   const { rows: existingRows } = await pool.query("SELECT * FROM orders WHERE id = $1", [req.params.id]);
   if (existingRows.length === 0) {
     return res.status(404).json({ error: "Order not found" });
@@ -264,6 +265,6 @@ router.patch("/:id/delivery-status", async (req: Request, res: Response) => {
     [deliveryStatus, req.params.id]
   );
   res.json(mapRow(rows[0]));
-});
+}));
 
 export default router;
