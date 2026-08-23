@@ -1,0 +1,32 @@
+{
+  "name": "restaurant-pos-backend",
+  "version": "1.0.0",
+  "description": "Restaurant Billing / POS backend API",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "cloudinary": "^2.10.1",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
+    "express": "^4.19.2",
+    "multer": "^2.2.0",
+    "pg": "^8.23.0",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/compression": "^1.8.1",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/multer": "^2.2.0",
+    "@types/node": "^20.14.9",
+    "@types/pg": "^8.23.1",
+    "@types/uuid": "^9.0.8",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.5.3"
+  }
+}

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Saffron Table &mdash; POS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/styles.css?v=7" />
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-section brand">
+      <div class="brand-mark">ST</div>
+      <div class="brand-text">
+        <div class="brand-name">Saffron Table</div>
+        <div class="brand-sub">Restaurant POS</div>
+      </div>
+    </div>
+
+    <nav class="topbar-section nav">
+      <button class="nav-item active" data-view="billing">Billing</button>
+      <button class="nav-item" data-view="menu">Menu Management</button>
+      <button class="nav-item" data-view="deliveries">Deliveries</button>
+      <button class="nav-item" data-view="history">Order History</button>
+    </nav>
+
+    <div class="topbar-section topbar-clock">
+      <div id="clock" class="clock">--:--:--</div>
+      <div class="date" id="dateLabel">--</div>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- ========== BILLING VIEW ========== -->
+    <section id="view-billing" class="view active">
+      <header class="view-header">
+        <div>
+          <h1>New Bill</h1>
+          <p class="subtitle">Pick items, adjust quantity, apply tax &amp; discount</p>
+        </div>
+        <div class="header-stats" id="todayStats">
+          <div class="stat">
+            <span class="stat-value" id="statSales">₹0</span>
+            <span class="stat-label">Today's Sales</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value" id="statOrders">0</span>
+            <span class="stat-label">Orders Today</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="billing-layout">
+        <div class="filter-panel">
+          <div class="filter-block">
+            <div class="filter-title">Food Type</div>
+            <div class="veg-toggle" id="vegToggle">
+              <button class="veg-btn active" data-veg="all">All</button>
+              <button class="veg-btn" data-veg="veg"><span class="veg-dot veg"></span>Veg</button>
+              <button class="veg-btn" data-veg="nonveg"><span class="veg-dot nonveg"></span>Non-Veg</button>
+            </div>
+          </div>
+          <div class="filter-block">
+            <div class="filter-title">Categories</div>
+            <div class="category-list" id="categoryList_pills">
+              <button class="category-pill active" data-category="All">All Items</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="menu-panel">
+          <div class="toolbar">
+            <input type="search" id="searchInput" placeholder="Search menu items…" />
+          </div>
+          <div class="menu-grid" id="menuGrid"></div>
+        </div>
+
+        <div class="cart-panel">
+          <div class="cart-header">
+            <h2>Current Order</h2>
+            <button id="clearCartBtn" class="link-btn">Clear</button>
+          </div>
+
+          <div class="order-type-toggle" id="orderTypeToggle">
+            <button type="button" class="order-type-btn active" data-type="dine-in">Dine-in</button>
+            <button type="button" class="order-type-btn" data-type="delivery">Delivery</button>
+          </div>
+
+          <div class="cart-meta">
+            <input type="text" id="customerName" placeholder="Customer name (optional)" />
+            <input type="text" id="tableNumber" placeholder="Table #" />
+          </div>
+
+          <div class="delivery-details" id="deliveryFields" hidden>
+            <div class="delivery-details-title">Delivery Details</div>
+            <label class="delivery-field">
+              <span>Phone Number</span>
+              <input type="tel" id="deliveryPhone" placeholder="10-digit mobile number" />
+            </label>
+            <label class="delivery-field">
+              <span>Delivery Address</span>
+              <textarea id="deliveryAddress" placeholder="House/flat no., street, landmark, city" rows="2"></textarea>
+            </label>
+          </div>
+
+          <div class="cart-items" id="cartItems">
+            <div class="empty-cart">No items added yet</div>
+          </div>
+
+          <div class="cart-summary">
+            <div class="summary-row">
+              <span>Subtotal</span>
+              <span id="sumSubtotal">₹0.00</span>
+            </div>
+
+            <div class="summary-row control-row">
+              <label for="taxRate">Tax %</label>
+              <input type="number" id="taxRate" value="5" min="0" step="0.5" />
+            </div>
+
+            <div class="summary-row control-row">
+              <label for="discountType">Discount</label>
+              <select id="discountType">
+                <option value="none">None</option>
+                <option value="percent">Percent %</option>
+                <option value="flat">Flat ₹</option>
+              </select>
+              <input type="number" id="discountValue" value="0" min="0" step="1" />
+            </div>
+
+            <div class="summary-row">
+              <span>Discount Applied</span>
+              <span id="sumDiscount">−₹0.00</span>
+            </div>
+            <div class="summary-row">
+              <span>Tax Amount</span>
+              <span id="sumTax">+₹0.00</span>
+            </div>
+            <div class="summary-row control-row" id="deliveryChargeRow" hidden>
+              <label for="deliveryCharge">Delivery Charge</label>
+              <input type="number" id="deliveryCharge" value="0" min="0" step="1" />
+            </div>
+            <div class="summary-row control-row">
+              <label for="paymentMethod">Payment</label>
+              <select id="paymentMethod">
+                <option value="cash">Cash</option>
+                <option value="card">Card</option>
+                <option value="upi">UPI</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="summary-row total-row">
+              <span>Total</span>
+              <span id="sumTotal">₹0.00</span>
+            </div>
+          </div>
+
+          <button id="placeOrderBtn" class="primary-btn" disabled>Place Order &amp; Print Bill</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== MENU MANAGEMENT VIEW ========== -->
+    <section id="view-menu" class="view">
+      <header class="view-header">
+        <div>
+          <h1>Menu Management</h1>
+          <p class="subtitle">Add, edit, or remove menu items</p>
+        </div>
+        <button id="addItemBtn" class="primary-btn compact">+ Add Item</button>
+      </header>
+
+      <div class="toolbar">
+        <input type="search" id="menuMgmtSearch" placeholder="Search items…" />
+        <select id="menuMgmtCategory">
+          <option value="All">All Categories</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table" id="menuTable">
+          <thead>
+            <tr>
+              <th>Photo</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="menuTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========== DELIVERIES VIEW ========== -->
+    <section id="view-deliveries" class="view">
+      <header class="view-header">
+        <div>
+          <h1>Deliveries</h1>
+          <p class="subtitle">Phone-in orders out for delivery</p>
+        </div>
+      </header>
+
+      <div class="delivery-filters" id="deliveryStatusFilter">
+        <button type="button" class="chip-btn active" data-status="all">All</button>
+        <button type="button" class="chip-btn" data-status="pending">Pending</button>
+        <button type="button" class="chip-btn" data-status="out_for_delivery">Out for Delivery</button>
+        <button type="button" class="chip-btn" data-status="delivered">Delivered</button>
+        <button type="button" class="chip-btn" data-status="cancelled">Cancelled</button>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table" id="deliveriesTable">
+          <thead>
+            <tr>
+              <th>Bill #</th>
+              <th>Time</th>
+              <th>Customer</th>
+              <th>Phone</th>
+              <th>Address</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="deliveriesTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========== ORDER HISTORY VIEW ========== -->
+    <section id="view-history" class="view">
+      <div class="history-filters">
+        <input type="search" id="historySearch" placeholder="Search bill #, customer, table, item…" />
+        <select id="historyPayment">
+          <option value="all">All Payments</option>
+          <option value="cash">Cash</option>
+          <option value="card">Card</option>
+          <option value="upi">UPI</option>
+          <option value="other">Other</option>
+        </select>
+        <select id="historyOrderType">
+          <option value="all">All Types</option>
+          <option value="dine-in">Dine-in</option>
+          <option value="delivery">Delivery</option>
+        </select>
+        <div class="history-date-range">
+          <div class="date-picker" id="historyFromPicker">
+            <button type="button" class="date-picker-trigger" id="historyFromTrigger">
+              <span class="date-picker-icon">📅</span>
+              <span class="date-picker-label" id="historyFromLabel">From date</span>
+            </button>
+            <div class="date-picker-panel" id="historyFromPanel"></div>
+          </div>
+          <span class="date-sep">to</span>
+          <div class="date-picker" id="historyToPicker">
+            <button type="button" class="date-picker-trigger" id="historyToTrigger">
+              <span class="date-picker-icon">📅</span>
+              <span class="date-picker-label" id="historyToLabel">To date</span>
+            </button>
+            <div class="date-picker-panel" id="historyToPanel"></div>
+          </div>
+        </div>
+        <button id="historyTodayBtn" class="chip-btn active">Today</button>
+        <button id="historyAllBtn" class="chip-btn">All Time</button>
+        <button id="historyResetBtn" class="link-btn">Reset</button>
+      </div>
+
+      <div class="summary-cards" id="historySummary">
+        <div class="summary-card">
+          <span class="summary-card-value" id="histTotalSales">₹0</span>
+          <span class="summary-card-label">Total Sales</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-card-value" id="histTotalOrders">0</span>
+          <span class="summary-card-label">Total Orders</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-card-value" id="histItemsSold">0</span>
+          <span class="summary-card-label">Items Sold</span>
+        </div>
+        <div class="summary-card">
+          <span class="summary-card-value" id="histAvgBill">₹0</span>
+          <span class="summary-card-label">Average Bill</span>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table" id="ordersTable">
+          <thead>
+            <tr>
+              <th>Bill #</th>
+              <th>Time</th>
+              <th>Type</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Payment</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Add/Edit Menu Item Modal -->
+<div class="modal-overlay" id="itemModalOverlay">
+  <div class="modal">
+    <button type="button" class="modal-close-btn" id="itemModalClose" aria-label="Close">
+      <svg viewBox="0 0 20 20" width="14" height="14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <h2 id="itemModalTitle">Add Menu Item</h2>
+    <form id="itemForm">
+      <label>Name<input type="text" id="itemName" required /></label>
+      <label>Category
+        <div class="combo" id="categoryCombo">
+          <input type="text" id="itemCategory" autocomplete="off" placeholder="Select or type a category" required />
+          <button type="button" class="combo-toggle" id="categoryComboToggle" aria-label="Show categories">▾</button>
+          <div class="combo-panel" id="categoryComboPanel"></div>
+        </div>
+      </label>
+      <label class="checkbox-label">
+        <input type="checkbox" id="itemHasPortions" /> Has separate Half / Full pricing
+      </label>
+
+      <label id="singlePriceField">Price (₹)<input type="number" id="itemPrice" min="0" step="0.5" /></label>
+      <div class="modal-row" id="portionPriceFields" hidden>
+        <label>Half Price (₹)<input type="number" id="itemHalfPrice" min="0" step="0.5" /></label>
+        <label>Full Price (₹)<input type="number" id="itemFullPrice" min="0" step="0.5" /></label>
+      </div>
+
+      <label>Description (optional)<textarea id="itemDescription" rows="2"></textarea></label>
+
+      <label>Photo (optional)
+        <div class="photo-upload">
+          <div class="photo-preview" id="itemImagePreview"><span class="photo-preview-icon">🖼️</span></div>
+          <div class="photo-upload-actions">
+            <input type="file" id="itemImageFile" accept="image/jpeg,image/png" hidden />
+            <button type="button" class="upload-btn" id="itemImageBtn">Choose Photo</button>
+            <span class="photo-hint">JPG or PNG, up to 2MB</span>
+            <button type="button" class="link-btn photo-remove-btn" id="itemImageRemove" hidden>Remove photo</button>
+          </div>
+        </div>
+      </label>
+
+      <div class="modal-row">
+        <label class="radio-label">
+          <input type="radio" name="itemVeg" id="itemVegYes" value="veg" checked />
+          <span class="veg-dot veg"></span> Veg
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="itemVeg" id="itemVegNo" value="nonveg" />
+          <span class="veg-dot nonveg"></span> Non-Veg
+        </label>
+      </div>
+
+      <label class="checkbox-label">
+        <input type="checkbox" id="itemAvailable" checked /> Available
+      </label>
+      <div class="modal-actions">
+        <button type="button" class="ghost-btn" id="itemModalCancel">Cancel</button>
+        <button type="submit" class="primary-btn compact">Save Item</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Printable Receipt (hidden, used only for printing) -->
+<div id="receipt" class="receipt-print"></div>
+
+<div id="toast" class="toast"></div>
+
+<script src="js/api.js?v=7"></script>
+<script src="js/custom-select.js?v=7"></script>
+<script src="js/datepicker.js?v=7"></script>
+<script src="js/billing.js?v=7"></script>
+<script src="js/menu-management.js?v=7"></script>
+<script src="js/history.js?v=7"></script>
+<script src="js/deliveries.js?v=7"></script>
+<script src="js/app.js?v=7"></script>
+</body>
+</html>
