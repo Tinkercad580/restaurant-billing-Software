@@ -119,7 +119,7 @@ const OrderHistory = (() => {
   function renderTable(orders) {
     const tbody = document.getElementById("ordersTableBody");
     if (orders.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--ink-soft)">No orders found</td></tr>`;
+      tbody.innerHTML = `<tr><td class="empty-row" colspan="7" style="text-align:center;color:var(--ink-soft)">No orders found</td></tr>`;
       return;
     }
     tbody.innerHTML = orders
@@ -129,13 +129,13 @@ const OrderHistory = (() => {
         const type = order.orderType || "dine-in";
         return `
         <tr>
-          <td><strong>#${order.billNumber}</strong></td>
-          <td>${time}</td>
-          <td style="white-space:nowrap;text-transform:capitalize">${escapeHtml(type.replace("-", " "))}</td>
-          <td style="max-width:260px">${escapeHtml(itemsSummary)}</td>
-          <td>${formatCurrency(order.total)}</td>
-          <td style="text-transform:capitalize">${order.paymentMethod}</td>
-          <td><button class="icon-btn" data-action="print" data-bill="${order.billNumber}">Print</button></td>
+          <td data-label="Bill #"><strong>#${order.billNumber}</strong></td>
+          <td data-label="Time">${time}</td>
+          <td data-label="Type" style="white-space:nowrap;text-transform:capitalize">${escapeHtml(type.replace("-", " "))}</td>
+          <td data-label="Items" style="max-width:260px">${escapeHtml(itemsSummary)}</td>
+          <td data-label="Total">${formatCurrency(order.total)}</td>
+          <td data-label="Payment" style="text-transform:capitalize">${order.paymentMethod}</td>
+          <td class="cell-actions" data-label=""><button class="icon-btn" data-action="print" data-bill="${order.billNumber}">Print</button></td>
         </tr>`;
       })
       .join("");

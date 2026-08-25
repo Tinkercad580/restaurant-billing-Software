@@ -183,26 +183,26 @@ const MenuManagement = (() => {
   function renderTable() {
     const tbody = document.getElementById("menuTableBody");
     if (items.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--ink-soft)">No items found</td></tr>`;
+      tbody.innerHTML = `<tr><td class="empty-row" colspan="6" style="text-align:center;color:var(--ink-soft)">No items found</td></tr>`;
       return;
     }
     tbody.innerHTML = items
       .map(
         (item) => `
       <tr>
-        <td>${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" alt="" style="width:40px;height:40px;object-fit:cover;border-radius:6px" />` : `<div style="width:40px;height:40px;border-radius:6px;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:16px">🍽️</div>`}</td>
-        <td>
+        <td class="cell-photo" data-label="">${item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" alt="" style="width:40px;height:40px;object-fit:cover;border-radius:6px" />` : `<div style="width:40px;height:40px;border-radius:6px;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:16px">🍽️</div>`}</td>
+        <td data-label="Name">
           <span class="veg-dot ${item.isVeg ? "veg" : "nonveg"}" style="display:inline-block;vertical-align:middle;margin-right:6px" title="${item.isVeg ? "Veg" : "Non-Veg"}"></span>
           <strong>${escapeHtml(item.name)}</strong>${item.description ? `<br/><span style="color:var(--ink-soft);font-size:11.5px">${escapeHtml(item.description)}</span>` : ""}
         </td>
-        <td>${escapeHtml(item.category)}</td>
-        <td>${
+        <td data-label="Category">${escapeHtml(item.category)}</td>
+        <td data-label="Price">${
           item.hasPortions
             ? `<span title="Half">H ${formatCurrency(item.halfPrice)}</span> / <span title="Full">F ${formatCurrency(item.fullPrice)}</span>`
             : formatCurrency(item.price)
         }</td>
-        <td><span class="badge ${item.available ? "badge-success" : "badge-danger"}">${item.available ? "Available" : "Unavailable"}</span></td>
-        <td style="white-space:nowrap">
+        <td data-label="Status"><span class="badge ${item.available ? "badge-success" : "badge-danger"}">${item.available ? "Available" : "Unavailable"}</span></td>
+        <td class="cell-actions" data-label="" style="white-space:nowrap">
           <button class="icon-btn" data-action="edit" data-id="${item.id}">Edit</button>
           <button class="icon-btn danger" data-action="delete" data-id="${item.id}">Delete</button>
         </td>

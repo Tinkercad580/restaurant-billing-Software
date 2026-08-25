@@ -50,7 +50,7 @@ const Deliveries = (() => {
   function renderTable(orders) {
     const tbody = document.getElementById("deliveriesTableBody");
     if (orders.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--ink-soft)">No delivery orders found</td></tr>`;
+      tbody.innerHTML = `<tr><td class="empty-row" colspan="8" style="text-align:center;color:var(--ink-soft)">No delivery orders found</td></tr>`;
       return;
     }
     tbody.innerHTML = orders
@@ -60,14 +60,14 @@ const Deliveries = (() => {
         const next = NEXT_STATUS[status];
         return `
         <tr>
-          <td><strong>#${order.billNumber}</strong></td>
-          <td>${time}</td>
-          <td>${escapeHtml(order.customerName || "—")}</td>
-          <td>${escapeHtml(order.phone || "—")}</td>
-          <td style="max-width:220px">${escapeHtml(order.deliveryAddress || "—")}</td>
-          <td>${formatCurrency(order.total)}</td>
-          <td><span class="badge ${statusBadgeClass(status)}">${STATUS_LABELS[status] || status}</span></td>
-          <td style="white-space:nowrap">
+          <td data-label="Bill #"><strong>#${order.billNumber}</strong></td>
+          <td data-label="Time">${time}</td>
+          <td data-label="Customer">${escapeHtml(order.customerName || "—")}</td>
+          <td data-label="Phone">${escapeHtml(order.phone || "—")}</td>
+          <td data-label="Address" style="max-width:220px">${escapeHtml(order.deliveryAddress || "—")}</td>
+          <td data-label="Total">${formatCurrency(order.total)}</td>
+          <td data-label="Status"><span class="badge ${statusBadgeClass(status)}">${STATUS_LABELS[status] || status}</span></td>
+          <td class="cell-actions" data-label="" style="white-space:nowrap">
             ${next ? `<button class="icon-btn" data-action="advance" data-id="${order.id}" data-status="${next.status}">${next.label}</button>` : ""}
             ${status === "pending" || status === "out_for_delivery" ? `<button class="icon-btn danger" data-action="advance" data-id="${order.id}" data-status="cancelled">Cancel</button>` : ""}
             <button class="icon-btn" data-action="print" data-bill="${order.billNumber}">Print</button>

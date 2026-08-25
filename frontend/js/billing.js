@@ -50,6 +50,20 @@ const Billing = (() => {
       renderCart();
     });
     document.getElementById("deliveryCharge").addEventListener("input", renderCart);
+
+    document.getElementById("mobileCartBar").addEventListener("click", openMobileCart);
+    document.getElementById("mobileCartClose").addEventListener("click", closeMobileCart);
+    document.getElementById("mobileCartBackdrop").addEventListener("click", closeMobileCart);
+  }
+
+  function openMobileCart() {
+    document.getElementById("cartPanel").classList.add("open");
+    document.getElementById("mobileCartBackdrop").classList.add("open");
+  }
+
+  function closeMobileCart() {
+    document.getElementById("cartPanel").classList.remove("open");
+    document.getElementById("mobileCartBackdrop").classList.remove("open");
   }
 
   function applyOrderTypeVisibility() {
@@ -203,6 +217,8 @@ const Billing = (() => {
     } else {
       cart.push({ key, menuItemId: item.id, portion, name, price, quantity: 1 });
     }
+    // Only the floating bar updates here — the sheet itself never opens
+    // automatically, so adding items one after another is never interrupted.
     renderCart();
   }
 
@@ -282,6 +298,16 @@ const Billing = (() => {
     document.getElementById("sumTax").textContent = `+${formatCurrency(totals.taxAmount)}`;
     document.getElementById("sumTotal").textContent = formatCurrency(totals.total);
     document.getElementById("placeOrderBtn").disabled = cart.length === 0;
+
+    const totalQty = cart.reduce((sum, c) => sum + c.quantity, 0);
+    const bar = document.getElementById("mobileCartBar");
+    bar.hidden = cart.length === 0;
+    if (cart.length > 0) {
+      document.getElementById("mobileCartCount").textContent = `${totalQty} item${totalQty === 1 ? "" : "s"}`;
+      document.getElementById("mobileCartTotal").textContent = formatCurrency(totals.total);
+    } else {
+      closeMobileCart();
+    }
   }
 
   async function placeOrder() {
