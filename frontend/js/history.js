@@ -132,7 +132,7 @@ const OrderHistory = (() => {
           <td data-label="Bill #"><strong>#${order.billNumber}</strong></td>
           <td data-label="Time">${time}</td>
           <td data-label="Type" style="white-space:nowrap;text-transform:capitalize">${escapeHtml(type.replace("-", " "))}</td>
-          <td data-label="Items" style="max-width:260px">${escapeHtml(itemsSummary)}</td>
+          <td data-label="Items" class="cell-wrap">${escapeHtml(itemsSummary)}</td>
           <td data-label="Total">${formatCurrency(order.total)}</td>
           <td data-label="Payment" style="text-transform:capitalize">${order.paymentMethod}</td>
           <td class="cell-actions" data-label=""><button class="icon-btn" data-action="print" data-bill="${order.billNumber}">Print</button></td>

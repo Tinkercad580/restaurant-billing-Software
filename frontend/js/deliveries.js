@@ -64,7 +64,7 @@ const Deliveries = (() => {
           <td data-label="Time">${time}</td>
           <td data-label="Customer">${escapeHtml(order.customerName || "—")}</td>
           <td data-label="Phone">${escapeHtml(order.phone || "—")}</td>
-          <td data-label="Address" style="max-width:220px">${escapeHtml(order.deliveryAddress || "—")}</td>
+          <td data-label="Address" class="cell-wrap">${escapeHtml(order.deliveryAddress || "—")}</td>
           <td data-label="Total">${formatCurrency(order.total)}</td>
           <td data-label="Status"><span class="badge ${statusBadgeClass(status)}">${STATUS_LABELS[status] || status}</span></td>
           <td class="cell-actions" data-label="" style="white-space:nowrap">
