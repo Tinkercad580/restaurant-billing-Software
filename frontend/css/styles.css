@@ -119,12 +119,9 @@ input, select, textarea { font-family: inherit; }
   height: 40px;
   border-radius: 8px;
   background: var(--gold);
-  color: var(--maroon-dark);
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Poppins', sans-serif;
+  object-fit: contain;
+  padding: 7px;
+  box-sizing: border-box;
   flex-shrink: 0;
 }
 
@@ -1194,31 +1191,65 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
   .billing-layout { display: block; }
   .main { padding-bottom: 76px; } /* room for the floating cart bar */
 
-  /* Each filter becomes its own full-width, single-row, horizontally
-     scrollable strip of chips instead of wrapping (which was getting
-     clipped by the old fixed max-height). */
+  /* Two side-by-side columns instead of two full-width stacked strips:
+     Food Type as a narrow vertical list on the left, Categories filling
+     the remaining width on the right. No horizontal scroll needed for
+     either, and it's noticeably more compact than stacking them. */
   .filter-panel {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 14px;
     max-height: none;
     overflow: visible;
     padding: 12px;
     margin-bottom: 14px;
     position: static;
   }
-  .filter-block { width: 100%; min-width: 0; }
+  .filter-block { min-width: 0; }
   .filter-block + .filter-block { margin-top: 0; }
   .filter-title { margin-bottom: 6px; }
-  .veg-toggle, .category-list {
-    flex-direction: row;
-    flex-wrap: nowrap;
-    max-height: none;
-    overflow-x: auto;
-    overflow-y: visible;
-    padding-bottom: 2px;
+
+  .filter-block:first-child {
+    flex: 0 0 20%;
+    border-right: 1px solid var(--border);
+    padding-right: 10px;
   }
-  .veg-btn, .category-pill { flex-shrink: 0; white-space: nowrap; }
+  .veg-toggle { flex-direction: column; gap: 6px; }
+  .veg-btn { width: 100%; white-space: nowrap; justify-content: center; }
+
+  /* All has no icon so it keeps its text; Veg/Non-Veg show icon-only —
+     the green dot / brown triangle are a widely recognized standard —
+     with the label revealed on hover (desktop) or long-press (touch,
+     via the title attribute) rather than taking up column width always. */
+  .veg-btn[data-veg="veg"] .veg-dot,
+  .veg-btn[data-veg="nonveg"] .veg-dot { margin: 0; }
+  .veg-btn-label {
+    display: none;
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 6px);
+    transform: translateX(-50%);
+    background: var(--ink);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    z-index: 10;
+  }
+  .veg-btn { position: relative; }
+  .veg-btn:hover .veg-btn-label, .veg-btn:focus-visible .veg-btn-label { display: block; }
+
+  .filter-block:last-child { flex: 1 1 80%; min-width: 0; }
+  .category-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-height: none;
+    overflow: visible;
+  }
+  .category-pill { flex-shrink: 0; white-space: nowrap; }
 
   .menu-grid {
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
