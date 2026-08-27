@@ -38,6 +38,14 @@ const OrderHistory = (() => {
     document.getElementById("historyPayment").addEventListener("change", reload);
     document.getElementById("historyOrderType").addEventListener("change", reload);
 
+    document.getElementById("historyDateToggle").addEventListener("click", () => {
+      const panel = document.getElementById("historyDateRange");
+      const toggleBtn = document.getElementById("historyDateToggle");
+      const willOpen = panel.hidden;
+      panel.hidden = !willOpen;
+      toggleBtn.setAttribute("aria-expanded", String(willOpen));
+    });
+
     document.getElementById("historyTodayBtn").addEventListener("click", () => {
       quickRange = "today";
       clearDateInputs();
@@ -141,10 +149,10 @@ const OrderHistory = (() => {
         const time = new Date(order.createdAt).toLocaleString();
         const type = order.orderType || "dine-in";
         const cancelledBadge =
-          order.deliveryStatus === "cancelled" ? ` <span class="badge badge-danger">Cancelled</span>` : "";
+          order.deliveryStatus === "cancelled" ? `<span class="badge badge-danger">Cancelled</span> ` : "";
         return `
         <tr>
-          <td data-label="Bill #"><strong>#${order.billNumber}</strong>${cancelledBadge}</td>
+          <td data-label="Bill #"><span class="cell-value-group">${cancelledBadge}<strong>#${order.billNumber}</strong></span></td>
           <td data-label="Time">${time}</td>
           <td data-label="Type" style="white-space:nowrap;text-transform:capitalize">${escapeHtml(type.replace("-", " "))}</td>
           <td data-label="Items" class="cell-wrap">${escapeHtml(itemsSummary)}</td>

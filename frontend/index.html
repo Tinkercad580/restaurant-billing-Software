@@ -235,20 +235,29 @@
     <!-- ========== ORDER HISTORY VIEW ========== -->
     <section id="view-history" class="view">
       <div class="history-filters">
-        <input type="search" id="historySearch" placeholder="Search bill #, customer, table, item…" />
-        <select id="historyPayment">
-          <option value="all">All Payments</option>
-          <option value="cash">Cash</option>
-          <option value="card">Card</option>
-          <option value="upi">UPI</option>
-          <option value="other">Other</option>
-        </select>
-        <select id="historyOrderType">
-          <option value="all">All Types</option>
-          <option value="dine-in">Dine-in</option>
-          <option value="delivery">Delivery</option>
-        </select>
-        <div class="history-date-range">
+        <div class="history-search-row">
+          <input type="search" id="historySearch" placeholder="Search bill #, customer, table, item…" />
+          <button type="button" class="date-filter-toggle" id="historyDateToggle" aria-expanded="false" aria-controls="historyDateRange" aria-label="Toggle date filter">
+            <svg viewBox="0 0 12 8" width="12" height="8" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="history-filter-row">
+          <select id="historyPayment">
+            <option value="all">All Payments</option>
+            <option value="cash">Cash</option>
+            <option value="card">Card</option>
+            <option value="upi">UPI</option>
+            <option value="other">Other</option>
+          </select>
+          <select id="historyOrderType">
+            <option value="all">All Types</option>
+            <option value="dine-in">Dine-in</option>
+            <option value="delivery">Delivery</option>
+          </select>
+        </div>
+        <div class="history-date-range" id="historyDateRange" hidden>
           <div class="date-picker" id="historyFromPicker">
             <button type="button" class="date-picker-trigger" id="historyFromTrigger">
               <span class="date-picker-icon">📅</span>
@@ -265,9 +274,11 @@
             <div class="date-picker-panel" id="historyToPanel"></div>
           </div>
         </div>
-        <button id="historyTodayBtn" class="chip-btn active">Today</button>
-        <button id="historyAllBtn" class="chip-btn">All Time</button>
-        <button id="historyResetBtn" class="link-btn">Reset</button>
+        <div class="history-filter-actions">
+          <button id="historyTodayBtn" class="chip-btn active">Today</button>
+          <button id="historyAllBtn" class="chip-btn">All Time</button>
+          <button id="historyResetBtn" class="link-btn">Reset</button>
+        </div>
       </div>
 
       <div class="summary-cards" id="historySummary">
