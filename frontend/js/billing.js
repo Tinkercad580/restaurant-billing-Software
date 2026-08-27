@@ -186,7 +186,7 @@ const Billing = (() => {
       .map((item) => {
         const icon = CATEGORY_ICONS[item.category.toLowerCase()] || "🍽️";
         const image = item.imageUrl
-          ? `<div class="menu-card-image-frame"><img class="menu-card-image" src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)}" /></div>`
+          ? `<div class="menu-card-image-frame"><img class="menu-card-image" src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)}" loading="lazy" decoding="async" /></div>`
           : `<div class="menu-card-image-placeholder">${icon}</div>`;
 
         const halfQty = cartQuantityForKey(lineKey(item.id, "half"));
