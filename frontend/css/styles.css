@@ -38,6 +38,17 @@ html, body {
   font-size: 14px;
   overflow: hidden;
   max-width: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth, momentum-based touch scrolling wherever content scrolls */
+.main, .menu-grid, .cart-panel, .cart-items, .table-wrap, .filter-panel, .category-list, .combo-panel, .cs-panel {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Skip the ~300ms tap delay on interactive controls for snappier touch response */
+button, [role="button"] {
+  touch-action: manipulation;
 }
 
 img { max-width: 100%; display: block; }
@@ -322,9 +333,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
   text-align: left;
   background: var(--cream);
   overflow: hidden;
+  contain: layout style paint;
   transition: transform 0.1s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
-.menu-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--gold); }
+@media (hover: hover) and (pointer: fine) {
+  .menu-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--gold); }
+}
 .menu-card.in-cart {
   border-color: var(--maroon);
   background: #fbeeee;
@@ -598,7 +612,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
   box-shadow: 0 4px 12px rgba(107, 31, 42, 0.25);
   transition: background 0.15s ease, transform 0.1s ease;
 }
-.primary-btn:hover:not(:disabled) { background: var(--maroon-dark); transform: translateY(-1px); }
+@media (hover: hover) and (pointer: fine) {
+  .primary-btn:hover:not(:disabled) { background: var(--maroon-dark); transform: translateY(-1px); }
+}
 .primary-btn:disabled { background: #cbbfb5; cursor: not-allowed; box-shadow: none; }
 .primary-btn.compact { width: auto; margin-top: 0; padding: 9px 18px; font-size: 13px; box-shadow: none; }
 #placeOrderBtn::before { content: "🖨️"; font-size: 15px; }
@@ -796,7 +812,9 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
   height: 3px;
   background: linear-gradient(90deg, var(--gold), var(--maroon));
 }
-.summary-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+@media (hover: hover) and (pointer: fine) {
+  .summary-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+}
 .summary-card-value { display: block; font-size: 23px; font-weight: 700; color: var(--maroon); font-family: 'Poppins', sans-serif; letter-spacing: -0.01em; }
 .summary-card-label { display: block; font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 5px; font-weight: 600; }
 
@@ -1325,8 +1343,8 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
 
   .menu-grid {
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    max-height: calc(100vh - 260px);
-    overflow-y: auto;
+    max-height: none;
+    overflow-y: visible;
   }
 
   /* Cart becomes a slide-up bottom sheet, opened via the floating bar. */
@@ -1413,6 +1431,7 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity: 1; }
     box-shadow: var(--shadow);
     margin-bottom: 10px;
     padding: 4px 12px;
+    contain: layout style paint;
   }
   .data-table td {
     display: flex;
