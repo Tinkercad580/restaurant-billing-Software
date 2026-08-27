@@ -2,6 +2,8 @@ const OrderHistory = (() => {
   let quickRange = "today"; // "today" | "all" | "custom"
   let fromPicker = null;
   let toPicker = null;
+  let lastOrders = [];
+  const paginator = createPaginator({ pageSize: 20 });
 
   function init() {
     fromPicker = createDatePicker({
@@ -98,22 +100,33 @@ const OrderHistory = (() => {
 
   async function reload() {
     try {
-      const [orders, summary] = await Promise.all([
-        Api.getOrders(buildParams()),
-        Api.getTodaySummary(),
-      ]);
-      renderSummary(summary);
-      renderTable(orders);
+      lastOrders = await Api.getOrders(buildParams());
+      paginator.reset();
+      renderSummary(lastOrders);
+      renderPage();
     } catch (err) {
       showToast(err.message, "error");
     }
   }
 
-  function renderSummary(summary) {
-    document.getElementById("histTotalSales").textContent = formatCurrency(summary.totalSales);
-    document.getElementById("histTotalOrders").textContent = summary.totalOrders;
-    document.getElementById("histItemsSold").textContent = summary.totalItemsSold;
-    document.getElementById("histAvgBill").textContent = formatCurrency(summary.averageBill);
+  function renderPage() {
+    renderTable(paginator.slice(lastOrders));
+    paginator.render(document.getElementById("historyPagination"), lastOrders.length, renderPage);
+  }
+
+  function renderSummary(orders) {
+    const totalSales = orders.reduce((sum, o) => sum + Number(o.total), 0);
+    const totalOrders = orders.length;
+    const totalItemsSold = orders.reduce(
+      (sum, o) => sum + o.items.reduce((s, i) => s + i.quantity, 0),
+      0
+    );
+    const averageBill = totalOrders > 0 ? totalSales / totalOrders : 0;
+
+    document.getElementById("histTotalSales").textContent = formatCurrency(totalSales);
+    document.getElementById("histTotalOrders").textContent = totalOrders;
+    document.getElementById("histItemsSold").textContent = totalItemsSold;
+    document.getElementById("histAvgBill").textContent = formatCurrency(averageBill);
   }
 
   function renderTable(orders) {
@@ -127,9 +140,11 @@ const OrderHistory = (() => {
         const itemsSummary = order.items.map((i) => `${i.name} x${i.quantity}`).join(", ");
         const time = new Date(order.createdAt).toLocaleString();
         const type = order.orderType || "dine-in";
+        const cancelledBadge =
+          order.deliveryStatus === "cancelled" ? ` <span class="badge badge-danger">Cancelled</span>` : "";
         return `
         <tr>
-          <td data-label="Bill #"><strong>#${order.billNumber}</strong></td>
+          <td data-label="Bill #"><strong>#${order.billNumber}</strong>${cancelledBadge}</td>
           <td data-label="Time">${time}</td>
           <td data-label="Type" style="white-space:nowrap;text-transform:capitalize">${escapeHtml(type.replace("-", " "))}</td>
           <td data-label="Items" class="cell-wrap">${escapeHtml(itemsSummary)}</td>

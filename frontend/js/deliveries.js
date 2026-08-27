@@ -1,5 +1,7 @@
 const Deliveries = (() => {
   let activeStatus = "all";
+  let lastOrders = [];
+  const paginator = createPaginator({ pageSize: 20 });
 
   const STATUS_LABELS = {
     pending: "Pending",
@@ -34,11 +36,17 @@ const Deliveries = (() => {
     try {
       const params = { orderType: "delivery" };
       if (activeStatus !== "all") params.deliveryStatus = activeStatus;
-      const orders = await Api.getOrders(params);
-      renderTable(orders);
+      lastOrders = await Api.getOrders(params);
+      paginator.reset();
+      renderPage();
     } catch (err) {
       showToast(err.message, "error");
     }
+  }
+
+  function renderPage() {
+    renderTable(paginator.slice(lastOrders));
+    paginator.render(document.getElementById("deliveriesPagination"), lastOrders.length, renderPage);
   }
 
   function statusBadgeClass(status) {

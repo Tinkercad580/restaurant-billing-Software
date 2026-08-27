@@ -131,6 +131,51 @@ const Billing = (() => {
     return `${menuItemId}::${portion || "single"}`;
   }
 
+  function cartQuantityFor(menuItemId) {
+    return cart
+      .filter((c) => c.menuItemId === menuItemId)
+      .reduce((sum, c) => sum + c.quantity, 0);
+  }
+
+  function cartQuantityForKey(key) {
+    const line = cart.find((c) => c.key === key);
+    return line ? line.quantity : 0;
+  }
+
+  function updateMenuCardHighlights() {
+    document.querySelectorAll("#menuGrid .menu-card[data-menu-id]").forEach((card) => {
+      const qty = cartQuantityFor(card.dataset.menuId);
+      card.classList.toggle("in-cart", qty > 0);
+      let badge = card.querySelector(":scope > .menu-card-cart-badge");
+      if (qty > 0) {
+        if (!badge) {
+          badge = document.createElement("span");
+          badge.className = "menu-card-cart-badge";
+          card.prepend(badge);
+        }
+        badge.textContent = qty;
+      } else if (badge) {
+        badge.remove();
+      }
+
+      card.querySelectorAll(".portion-btn").forEach((btn) => {
+        const portionQty = cartQuantityForKey(lineKey(btn.dataset.id, btn.dataset.portion));
+        btn.classList.toggle("in-cart", portionQty > 0);
+        let portionBadge = btn.querySelector(".portion-btn-badge");
+        if (portionQty > 0) {
+          if (!portionBadge) {
+            portionBadge = document.createElement("span");
+            portionBadge.className = "portion-btn-badge";
+            btn.appendChild(portionBadge);
+          }
+          portionBadge.textContent = portionQty;
+        } else if (portionBadge) {
+          portionBadge.remove();
+        }
+      });
+    });
+  }
+
   function renderMenuGrid() {
     const grid = document.getElementById("menuGrid");
     if (menuItems.length === 0) {
@@ -144,13 +189,18 @@ const Billing = (() => {
           ? `<div class="menu-card-image-frame"><img class="menu-card-image" src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)}" /></div>`
           : `<div class="menu-card-image-placeholder">${icon}</div>`;
 
+        const halfQty = cartQuantityForKey(lineKey(item.id, "half"));
+        const fullQty = cartQuantityForKey(lineKey(item.id, "full"));
+
         const priceBlock = item.hasPortions
           ? `<div class="menu-card-portions">
-               <button type="button" class="portion-btn" data-id="${item.id}" data-portion="half" ${item.available ? "" : "disabled"}>
+               <button type="button" class="portion-btn ${halfQty > 0 ? "in-cart" : ""}" data-id="${item.id}" data-portion="half" ${item.available ? "" : "disabled"}>
                  <span>Half</span><span>${formatCurrency(item.halfPrice)}</span>
+                 ${halfQty > 0 ? `<span class="portion-btn-badge">${halfQty}</span>` : ""}
                </button>
-               <button type="button" class="portion-btn" data-id="${item.id}" data-portion="full" ${item.available ? "" : "disabled"}>
+               <button type="button" class="portion-btn ${fullQty > 0 ? "in-cart" : ""}" data-id="${item.id}" data-portion="full" ${item.available ? "" : "disabled"}>
                  <span>Full</span><span>${formatCurrency(item.fullPrice)}</span>
+                 ${fullQty > 0 ? `<span class="portion-btn-badge">${fullQty}</span>` : ""}
                </button>
              </div>`
           : `<span class="menu-card-price">${formatCurrency(item.price)}</span>`;
@@ -159,8 +209,12 @@ const Billing = (() => {
           ? ""
           : `data-id="${item.id}" role="button" tabindex="0"`;
 
+        const inCartQty = cartQuantityFor(item.id);
+        const cartBadge = inCartQty > 0 ? `<span class="menu-card-cart-badge">${inCartQty}</span>` : "";
+
         return `
-      <div class="menu-card ${item.available ? "" : "menu-card-unavailable"}" ${cardAttrs}>
+      <div class="menu-card ${item.available ? "" : "menu-card-unavailable"} ${inCartQty > 0 ? "in-cart" : ""}" data-menu-id="${item.id}" ${cardAttrs}>
+        ${cartBadge}
         <button type="button" class="menu-card-edit-btn" data-edit-id="${item.id}" title="Edit item" aria-label="Edit ${escapeHtml(item.name)}">
           <svg viewBox="0 0 20 20" width="13" height="13" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M13.6 2.4a1.5 1.5 0 0 1 2.12 0l1.88 1.88a1.5 1.5 0 0 1 0 2.12L7.4 16.6l-4.2.8.8-4.2L13.6 2.4Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
@@ -308,6 +362,8 @@ const Billing = (() => {
     } else {
       closeMobileCart();
     }
+
+    updateMenuCardHighlights();
   }
 
   async function placeOrder() {
